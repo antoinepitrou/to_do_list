@@ -10,6 +10,18 @@ function toDoList() {
 toDoList.prototype = {
   addItem: function(listItem) {
     this.items.push(listItem);
+  },
+  render: function() {
+    var ul = document.createElement("ul");
+    this.items.forEach(function(item){
+      ul.appendChild(item.render());
+    })
+    return ul;
+  },
+  injectToDom: function() {
+    var toDoListDiv = document.getElementById("to-do-list");
+    toDoListDiv.innerHTML = "";
+    toDoListDiv.appendChild(this.render());
   }
 }
 
@@ -21,10 +33,31 @@ function toDoListItem(itemText) {
 toDoListItem.prototype = {
   markComplete: function() {
     this.complete = true;
+  },
+  render: function() {
+    var li = document.createElement("li");
+    var input = document.createElement("input");
+    li.setAttribute("class", "to-do-list-item");
+    input.setAttribute("type","checkbox");
+    input.setAttribute("value", this.complete);
+    li.textContent = this.text;
+    li.appendChild(input);
+    return li;
   }
+
 }
 
 myList = new toDoList();
+
+// function injectList(listItem) {
+//   var li = document.createElement("li");
+//   var input = document.createElement("input");
+//   li.setAttribute("class", "to-do-list-item");
+//   input.setAttribute("type","checkbox");
+//   input.setAttribute("value", listItem.complete);
+//   li.textContent = listItem.text;
+//   ul.appendChild(li).appendChild(input);
+// }
 
 document.addEventListener("submit",function(e){
   e.preventDefault();
@@ -32,4 +65,5 @@ document.addEventListener("submit",function(e){
   var myListItem = new toDoListItem(inputText);
   myList.addItem(myListItem);
   console.log(myList);
+  myList.injectToDom();
 });
