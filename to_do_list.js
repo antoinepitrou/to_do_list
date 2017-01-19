@@ -22,12 +22,21 @@ toDoList.prototype = {
     var toDoListDiv = document.getElementById("to-do-list");
     toDoListDiv.innerHTML = "";
     toDoListDiv.appendChild(this.render());
+  },
+  extractItem: function(itemId) {
+    for (var i=0;i<this.items.length;i++) {
+      var item = this.items[i];
+      if (item.id === parseInt(itemId)) {
+        return item;
+      }
+    }
   }
 }
 
-function toDoListItem(itemText) {
+function toDoListItem(itemText, id) {
   this.complete = false;
   this.text = itemText;
+  this.id = id;
 }
 
 toDoListItem.prototype = {
@@ -37,33 +46,35 @@ toDoListItem.prototype = {
   render: function() {
     var li = document.createElement("li");
     var input = document.createElement("input");
-    li.setAttribute("class", "to-do-list-item");
+    li.classList.add("to-do-list-item");
+    if (this.complete) {
+      li.classList.add("completed");
+      input.setAttribute("checked", this.complete);
+    }
+    li.setAttribute("data-id", this.id);
     input.setAttribute("type","checkbox");
-    input.setAttribute("value", this.complete);
     li.textContent = this.text;
     li.appendChild(input);
     return li;
   }
-
 }
 
 myList = new toDoList();
-
-// function injectList(listItem) {
-//   var li = document.createElement("li");
-//   var input = document.createElement("input");
-//   li.setAttribute("class", "to-do-list-item");
-//   input.setAttribute("type","checkbox");
-//   input.setAttribute("value", listItem.complete);
-//   li.textContent = listItem.text;
-//   ul.appendChild(li).appendChild(input);
-// }
+listItemCounter = 0;
 
 document.addEventListener("submit",function(e){
   e.preventDefault();
   var inputText = document.getElementById("to-do-input").value;
-  var myListItem = new toDoListItem(inputText);
+  listItemCounter++;
+  var myListItem = new toDoListItem(inputText, listItemCounter);
   myList.addItem(myListItem);
   console.log(myList);
   myList.injectToDom();
 });
+
+document.getElementById("to-do-list").addEventListener("change", function(e){
+  var itemId = e.target.parentNode.dataset.id;
+  var item = myList.extractItem(itemId);
+  item.markComplete();
+  myList.injectToDom();
+})
